@@ -151,4 +151,3 @@ export const useLogout = () => {
     );
 };
 
-export { useAuth };
