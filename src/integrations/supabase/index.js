@@ -19,98 +19,149 @@ const fromSupabase = async (query) => {
 
 /* supabase integration types
 
-// EXAMPLE TYPES SECTION
-// DO NOT USE TYPESCRIPT AND SHOULD ALWAYS BE
+EventSignup // table: event_signups
+    id: string
+    event_id: number
+    name: string
+    email: string
+    created_at: string
 
-Foo // table: foos
+Event // table: events
     id: number
-    title: string
+    created_at: string
+    name: string
+    date: string
+    description: string
+    venue_id: number
+    is_pinned: boolean
+    image_url: string
+    pdf_url: string
+    latitude: number
+    longitude: number
 
-Bar // table: bars
+Comment // table: comments
     id: number
-    foo_id: number // foreign key to Foo
-	
+    created_at: string
+    content: string
+    event_id: number
+
+Venue // table: venues
+    id: number
+    name: string
+    location: string
+    description: string
+    created_at: string
+    updated_at: string
+
 */
 
 // Example hook for models
 
-export const useFoo = ()=> useQuery({
-    queryKey: ['foo'],
-    queryFn: fromSupabase(supabase.from('foo')),
-})
-export const useAddFoo = () => {
+export const useEventSignups = () => useQuery({
+    queryKey: ['event_signups'],
+    queryFn: () => fromSupabase(supabase.from('event_signups').select('*')),
+});
+export const useAddEventSignup = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (newFoo)=> fromSupabase(supabase.from('foo').insert([{ title: newFoo.title }])),
-        onSuccess: ()=> {
-            queryClient.invalidateQueries('foo');
+        mutationFn: (newSignup) => fromSupabase(supabase.from('event_signups').insert([newSignup])),
+        onSuccess: () => {
+            queryClient.invalidateQueries('event_signups');
         },
     });
 };
 
-export const useBar = ()=> useQuery({
-    queryKey: ['bar'],
-    queryFn: fromSupabase(supabase.from('bar')),
-})
-export const useAddBar = () => {
+export const useEvents = () => useQuery({
+    queryKey: ['events'],
+    queryFn: () => fromSupabase(supabase.from('events').select('*')),
+});
+export const useAddEvent = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (newBar)=> fromSupabase(supabase.from('bar').insert([{ foo_id: newBar.foo_id }])),
-        onSuccess: ()=> {
-            queryClient.invalidateQueries('bar');
+        mutationFn: (newEvent) => fromSupabase(supabase.from('events').insert([newEvent])),
+        onSuccess: () => {
+            queryClient.invalidateQueries('events');
+        },
+    });
+};
+
+export const useComments = () => useQuery({
+    queryKey: ['comments'],
+    queryFn: () => fromSupabase(supabase.from('comments').select('*')),
+});
+export const useAddComment = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (newComment) => fromSupabase(supabase.from('comments').insert([newComment])),
+        onSuccess: () => {
+            queryClient.invalidateQueries('comments');
+        },
+    });
+};
+
+export const useVenues = () => useQuery({
+    queryKey: ['venues'],
+    queryFn: () => fromSupabase(supabase.from('venues').select('*')),
+});
+export const useAddVenue = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (newVenue) => fromSupabase(supabase.from('venues').insert([newVenue])),
+        onSuccess: () => {
+            queryClient.invalidateQueries('venues');
         },
     });
 };
 
 // Hook for login
 export const useLogin = () => {
-  const queryClient = useQueryClient();
+    const queryClient = useQueryClient();
 
-  return useMutation(
-    async ({ email, password }) => {
-      const { error, user } = await supabase.auth.signIn({ email, password });
-      if (error) throw error;
-      return user;
-    },
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries('user');
-      },
-    }
-  );
+    return useMutation(
+        async ({ email, password }) => {
+            const { error, user } = await supabase.auth.signInWithPassword({ email, password });
+            if (error) throw error;
+            return user;
+        },
+        {
+            onSuccess: () => {
+                queryClient.invalidateQueries('user');
+            },
+        }
+    );
 };
 
-// Example hook for registration
+// Hook for registration
 export const useRegister = () => {
-  const queryClient = useQueryClient();
+    const queryClient = useQueryClient();
 
-  return useMutation(
-    async ({ email, password }) => {
-      const { error, user } = await supabase.auth.signUp({ email, password });
-      if (error) throw error;
-      return user;
-    },
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries('user');
-      },
-    }
-  );
+    return useMutation(
+        async ({ email, password }) => {
+            const { error, user } = await supabase.auth.signUp({ email, password });
+            if (error) throw error;
+            return user;
+        },
+        {
+            onSuccess: () => {
+                queryClient.invalidateQueries('user');
+            },
+        }
+    );
 };
 
 // Hook for logout
 export const useLogout = () => {
-  const queryClient = useQueryClient();
+    const queryClient = useQueryClient();
 
-  return useMutation(
-    async () => {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-    },
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries('user');
-      },
-    }
-  );
+    return useMutation(
+        async () => {
+            const { error } = await supabase.auth.signOut();
+            if (error) throw error;
+        },
+        {
+            onSuccess: () => {
+                queryClient.invalidateQueries('user');
+            },
+        }
+    );
 };
