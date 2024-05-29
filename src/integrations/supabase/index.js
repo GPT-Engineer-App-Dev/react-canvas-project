@@ -1,16 +1,14 @@
-import { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import { useQuery, useMutation, useQueryClient, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from "react";
-
-const supabaseUrl = import.meta.env.VITE_SUPABASE_PROJECT_URL;
-const supabaseKey = import.meta.env.VITE_SUPABASE_API_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
-
 export const queryClient = new QueryClient();
 export function SupabaseProvider({ children }) {
     return React.createElement(QueryClientProvider, { client: queryClient }, children);
 }
+
+const supabaseUrl = import.meta.env.VITE_SUPABASE_PROJECT_URL;
+const supabaseKey = import.meta.env.VITE_SUPABASE_API_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 const fromSupabase = async (query) => {
     const { data, error } = await query;
@@ -18,27 +16,43 @@ const fromSupabase = async (query) => {
     return data;
 };
 
-export const useAuth = () => {
-  const [user, setUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+/* supabase integration types
 
-  useEffect(() => {
-    const session = supabase.auth.session();
-    setUser(session?.user ?? null);
-    setIsLoading(false);
+EventSignup // table: event_signups
+    id: string
+    event_id: number
+    name: string
+    email: string
+    created_at: string
 
-    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user ?? null);
-      setIsLoading(false);
-    });
+Event // table: events
+    id: number
+    created_at: string
+    name: string
+    date: string
+    description: string
+    venue_id: number
+    is_pinned: boolean
+    image_url: string
+    pdf_url: string
+    latitude: number
+    longitude: number
 
-    return () => {
-      authListener?.unsubscribe();
-    };
-  }, []);
+Comment // table: comments
+    id: number
+    created_at: string
+    content: string
+    event_id: number
 
-  return { user, isLoading };
-};
+Venue // table: venues
+    id: number
+    name: string
+    location: string
+    description: string
+    created_at: string
+    updated_at: string
+
+*/
 
 // Example hook for models
 
@@ -149,5 +163,25 @@ export const useLogout = () => {
             },
         }
     );
+};
+
+// Hook for authentication state
+export const useAuth = () => {
+    const [user, setUser] = React.useState(null);
+
+    React.useEffect(() => {
+        const session = supabase.auth.session();
+        setUser(session?.user ?? null);
+
+        const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+            setUser(session?.user ?? null);
+        });
+
+        return () => {
+            authListener?.unsubscribe();
+        };
+    }, []);
+
+    return user;
 };
 

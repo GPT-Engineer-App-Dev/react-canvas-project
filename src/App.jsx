@@ -1,14 +1,11 @@
 import { Route, BrowserRouter as Router, Routes, Navigate } from "react-router-dom";
 import Index from "./pages/Index.jsx";
-
+import Login from "./pages/Login.jsx";
 import { useAuth } from "./integrations/supabase/index.js";
 
 function App() {
-  const { user, isLoading } = useAuth();
+  const user = useAuth();
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
   return (
     <Router>
       <Routes>
@@ -16,6 +13,11 @@ function App() {
           exact
           path="/"
           element={user ? <Index /> : <Navigate to="/login" />}
+        />
+        <Route
+          exact
+          path="/login"
+          element={<Login />}
         />
       </Routes>
     </Router>
