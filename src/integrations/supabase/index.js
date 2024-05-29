@@ -165,3 +165,5 @@ export const useLogout = () => {
         }
     );
 };
+
+export { supabase };
